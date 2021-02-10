@@ -52,36 +52,42 @@ func Generate(options GenerateRequest) (result GenerateResponse, err error) {
 	result.StreamKey = stream.Cdn.IngestionInfo.StreamName
 	result.StreamKeyName = stream.Snippet.Title
 
-	// broadcast, err := svc.LiveBroadcasts.Insert(
-	// 	[]string{
-	// 		"snippet",
-	// 		"cdn",
-	// 		"contentDetails",
-	// 	},
-	// 	&yt.LiveBroadcast{
-	// 		Snippet: &yt.LiveBroadcastSnippet{
-	// 			Title: fmt.Sprintf("[%s] Generated Key", options.Date.Format("2006-01-02")),
-	// 		},
-	// 		Cdn: &yt.CdnSettings{
-	// 			FrameRate:     "30fps",
-	// 			IngestionType: "rtmp",
-	// 			Resolution:    "1080p",
-	// 		},
-	// 		ContentDetails: &yt.LiveBroadcastContentDetails{
-	// 			IsReusable: false,
-	// 		},
-	// 	},
-	// ).Do()
+	broadcast, err := svc.LiveBroadcasts.Insert(
+		[]string{
+			"snippet",
+			"status",
+			"contentDetails",
+		},
+		&yt.LiveBroadcast{
+			Snippet: &yt.LiveBroadcastSnippet{
+				Title:              options.Title,
+				Description:        options.Description,
+				ScheduledStartTime: options.Date.Format(time.RFC3339),
+			},
+			Status: &yt.LiveBroadcastStatus{
+				PrivacyStatus:           "public",
+				SelfDeclaredMadeForKids: false,
+			},
+			ContentDetails: &yt.LiveBroadcastContentDetails{
+				EnableAutoStart: options.AutoStart,
+				EnableAutoStop:  options.AutoStop,
+				EnableDvr:       options.DVR,
+			},
+		},
+	).Do()
 
 	if err != nil {
 		err = errors.Wrap(err, "could not create a new stream")
 		return
 	}
 
+	result.ID = broadcast.Id
+	result.Title = broadcast.Snippet.Title
+	result.Link = fmt.Sprintf("https://youtu.be/%s", broadcast.Id)
 	return
 }
 
-func Cleanup() ([]string, error) {
+func CleanupStreams(since time.Time) ([]string, error) {
 
 	ctx, tokenSource := getTokenSource()
 
@@ -115,7 +121,7 @@ func Cleanup() ([]string, error) {
 			continue
 		}
 
-		if date.Add(24 * 7 * time.Hour).After(time.Now()) {
+		if date.Before(since) {
 			continue
 		}
 
