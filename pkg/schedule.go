@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/araddon/dateparse"
 	"github.com/mniak/ytlive/internal"
 	"github.com/pkg/errors"
 	"google.golang.org/api/option"
@@ -17,9 +18,6 @@ type ScheduleRequest struct {
 	// Category     string
 	Date        time.Time
 	MadeForKids bool
-
-	NewStreamKey  bool
-	StreamKeyName string
 
 	AutoStart bool
 	AutoStop  bool
@@ -55,7 +53,7 @@ func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 		},
 		&youtube.LiveStream{
 			Snippet: &youtube.LiveStreamSnippet{
-				Title: fmt.Sprintf("[%s] Generated Key", options.Date.Format("2006-01-02")),
+				Title: fmt.Sprintf("[%s] Generated Key (ytlive)", options.Date.Format("2006-01-02")),
 			},
 			Cdn: &youtube.CdnSettings{
 				FrameRate:     "30fps",
@@ -106,8 +104,10 @@ func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 		return
 	}
 
+	scheduledDate, _ := dateparse.ParseAny(broadcast.Snippet.ScheduledStartTime)
 	result.ID = broadcast.Id
 	result.Title = broadcast.Snippet.Title
 	result.Link = fmt.Sprintf("https://youtu.be/%s", broadcast.Id)
+	result.Date = scheduledDate
 	return
 }

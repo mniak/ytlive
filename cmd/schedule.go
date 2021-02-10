@@ -45,14 +45,6 @@ var scheduleCmd = &cobra.Command{
 			log.Fatalf("invalid datetime: %s %s\n", args[1], args[2])
 		}
 
-		keyName, err := cmd.Flags().GetString("key-name")
-		if err != nil {
-			log.Fatalln(err)
-		}
-		newKey, err := cmd.Flags().GetBool("new-key")
-		if err != nil {
-			log.Fatalln(err)
-		}
 		autoStart, err := cmd.Flags().GetBool("auto-start")
 		if err != nil {
 			log.Fatalln(err)
@@ -67,13 +59,11 @@ var scheduleCmd = &cobra.Command{
 		}
 
 		request := pkg.ScheduleRequest{
-			Title:         title,
-			Date:          parsedDateTime,
-			StreamKeyName: keyName,
-			NewStreamKey:  newKey,
-			AutoStart:     autoStart,
-			AutoStop:      autoStop,
-			DVR:           dvr,
+			Title:     title,
+			Date:      parsedDateTime,
+			AutoStart: autoStart,
+			AutoStop:  autoStop,
+			DVR:       dvr,
 		}
 		response, err := pkg.Schedule(request)
 		if err != nil {
@@ -100,8 +90,6 @@ func init() {
 	scheduleCmd.PersistentFlags().String("client-secret", "", "the Youtube Client Secret")
 	viper.BindPFlag("Youtube.ClientSecret", scheduleCmd.PersistentFlags().Lookup("client-secret"))
 
-	scheduleCmd.Flags().String("key-name", "", "select stream key by name")
-	scheduleCmd.Flags().Bool("new-key", false, "create new stream key")
 	scheduleCmd.Flags().Bool("auto-start", false, "enable auto-start")
 	scheduleCmd.Flags().Bool("auto-stop", false, "enable auto-stop")
 	scheduleCmd.Flags().Bool("dvr", false, "enable DVR")
