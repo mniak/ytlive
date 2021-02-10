@@ -24,13 +24,14 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/mniak/generate-streams/youtube"
 	"github.com/spf13/cobra"
 )
 
-// youtubeCleanupCmd represents the youtube command
-var youtubeCleanupCmd = &cobra.Command{
+// cleanupCmd represents the youtube command
+var cleanupCmd = &cobra.Command{
 	Use: "cleanup",
 	Aliases: []string{
 		"clear",
@@ -39,7 +40,8 @@ var youtubeCleanupCmd = &cobra.Command{
 	Short: "Schedule a new youtube live stream",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		cleaned, err := youtube.Cleanup()
+		since := time.Now().Add(7 * 24 * time.Hour * -1)
+		cleaned, err := youtube.CleanupStreams(since)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -52,5 +54,5 @@ var youtubeCleanupCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(youtubeCleanupCmd)
+	youtubeCmd.AddCommand(cleanupCmd)
 }

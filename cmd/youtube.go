@@ -88,14 +88,11 @@ var youtubeCmd = &cobra.Command{
 		fmt.Printf("  Key Name:   %s\n", response.StreamKeyName)
 		fmt.Printf("  Stream Key: %s\n", response.StreamKey)
 		fmt.Printf("  Stream URL: %s\n", response.StreamURL)
-
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(youtubeCmd)
-
-	youtubeCmd.AddCommand(youtubeCleanupCmd)
 
 	youtubeCmd.PersistentFlags().String("client-id", "", "the Youtube Client ID")
 	viper.BindPFlag("Youtube.ClientID", youtubeCmd.PersistentFlags().Lookup("client-id"))
