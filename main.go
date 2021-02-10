@@ -21,7 +21,7 @@ THE SOFTWARE.
 */
 package main
 
-import "github.com/mniak/generate-streams/cmd"
+import "github.com/mniak/ytlive/cmd"
 
 func main() {
 	cmd.Execute()

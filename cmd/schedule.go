@@ -26,14 +26,14 @@ import (
 	"log"
 
 	"github.com/araddon/dateparse"
-	"github.com/mniak/generate-streams/youtube"
+	"github.com/mniak/ytlive/pkg"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// youtubeCmd represents the youtube command
-var youtubeCmd = &cobra.Command{
-	Use:     "youtube <title> <date> <time>",
+// scheduleCmd represents the schedule command
+var scheduleCmd = &cobra.Command{
+	Use:     "schedule <title> <date> <time>",
 	Aliases: []string{"yt"},
 	Short:   "Schedule a new youtube live stream",
 	Args:    cobra.ExactArgs(3),
@@ -66,7 +66,7 @@ var youtubeCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		request := youtube.GenerateRequest{
+		request := pkg.ScheduleRequest{
 			Title:         title,
 			Date:          parsedDateTime,
 			StreamKeyName: keyName,
@@ -75,12 +75,12 @@ var youtubeCmd = &cobra.Command{
 			AutoStop:      autoStop,
 			DVR:           dvr,
 		}
-		response, err := youtube.Generate(request)
+		response, err := pkg.Schedule(request)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		fmt.Println("Youtube Stream Generated:")
+		fmt.Println("Youtube Stream Scheduled:")
 		fmt.Printf("  ID:         %s\n", response.ID)
 		fmt.Printf("  Title:      %s\n", response.Title)
 		fmt.Printf("  Date:       %s\n", response.Date)
@@ -92,17 +92,17 @@ var youtubeCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(youtubeCmd)
+	rootCmd.AddCommand(scheduleCmd)
 
-	youtubeCmd.PersistentFlags().String("client-id", "", "the Youtube Client ID")
-	viper.BindPFlag("Youtube.ClientID", youtubeCmd.PersistentFlags().Lookup("client-id"))
+	scheduleCmd.PersistentFlags().String("client-id", "", "the Youtube Client ID")
+	viper.BindPFlag("Youtube.ClientID", scheduleCmd.PersistentFlags().Lookup("client-id"))
 
-	youtubeCmd.PersistentFlags().String("client-secret", "", "the Youtube Client Secret")
-	viper.BindPFlag("Youtube.ClientSecret", youtubeCmd.PersistentFlags().Lookup("client-secret"))
+	scheduleCmd.PersistentFlags().String("client-secret", "", "the Youtube Client Secret")
+	viper.BindPFlag("Youtube.ClientSecret", scheduleCmd.PersistentFlags().Lookup("client-secret"))
 
-	youtubeCmd.Flags().String("key-name", "", "select stream key by name")
-	youtubeCmd.Flags().Bool("new-key", false, "create new stream key")
-	youtubeCmd.Flags().Bool("auto-start", false, "enable auto-start")
-	youtubeCmd.Flags().Bool("auto-stop", false, "enable auto-stop")
-	youtubeCmd.Flags().Bool("dvr", false, "enable DVR")
+	scheduleCmd.Flags().String("key-name", "", "select stream key by name")
+	scheduleCmd.Flags().Bool("new-key", false, "create new stream key")
+	scheduleCmd.Flags().Bool("auto-start", false, "enable auto-start")
+	scheduleCmd.Flags().Bool("auto-stop", false, "enable auto-stop")
+	scheduleCmd.Flags().Bool("dvr", false, "enable DVR")
 }

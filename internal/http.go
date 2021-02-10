@@ -1,4 +1,4 @@
-package youtube
+package internal
 
 import (
 	"log"
@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func addLoggingTransportIfNeeded(client *http.Client) *http.Client {
+func AddLoggingTransportIfNeeded(client *http.Client) *http.Client {
 	if viper.GetBool("Debug") {
 		client.Transport = httplogger.NewLoggedTransport(http.DefaultTransport, newLogger())
 	}

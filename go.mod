@@ -1,4 +1,4 @@
-module github.com/mniak/generate-streams
+module github.com/mniak/ytlive
 
 go 1.14
 

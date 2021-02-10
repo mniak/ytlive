@@ -26,33 +26,33 @@ import (
 	"log"
 	"time"
 
-	"github.com/mniak/generate-streams/youtube"
+	"github.com/mniak/ytlive/pkg"
 	"github.com/spf13/cobra"
 )
 
-// cleanupCmd represents the youtube command
-var cleanupCmd = &cobra.Command{
-	Use: "cleanup",
-	Aliases: []string{
-		"clear",
-		"purge",
-	},
-	Short: "Schedule a new youtube live stream",
+// cleanupKeysCmd represents the cleanup-keys command
+var cleanupKeysCmd = &cobra.Command{
+	Use:   "cleanup-keys",
+	Short: "Cleanup old stream keys",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		since := time.Now().Add(7 * 24 * time.Hour * -1)
-		cleaned, err := youtube.CleanupStreams(since)
+		cleaned, err := pkg.CleanupKeys(since)
 		if err != nil {
 			log.Fatalln(err)
 		}
 
-		fmt.Println("Cleaned up old streams")
-		for _, streamName := range cleaned {
-			fmt.Printf("  - %s", streamName)
+		if len(cleaned) > 0 {
+			fmt.Println("Stream keys cleaned:")
+			for _, streamName := range cleaned {
+				fmt.Printf("  - %s", streamName)
+			}
+		} else {
+			fmt.Println("There was none old stream keys")
 		}
 	},
 }
 
 func init() {
-	youtubeCmd.AddCommand(cleanupCmd)
+	rootCmd.AddCommand(cleanupKeysCmd)
 }
