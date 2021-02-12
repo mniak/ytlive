@@ -29,7 +29,7 @@ func authenticate(config oauth2.Config) (token *oauth2.Token, err error) {
 		Config:         &config,
 		DeviceEndpoint: googledevice.DeviceEndpoint,
 	}
-	httpClient := internal.AddLoggingTransportIfNeeded(http.DefaultClient)
+	httpClient := http.DefaultClient
 	codeReq, err := oauth2device.RequestDeviceCode(httpClient, deviceConfig)
 	if err != nil {
 		err = errors.Wrap(err, "failed to request device code")

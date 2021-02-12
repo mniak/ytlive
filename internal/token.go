@@ -39,7 +39,7 @@ func (ts GoogleAuthTokenSource) Token() (token *oauth2.Token, err error) {
 		Config:         &ts.Config,
 		DeviceEndpoint: googledevice.DeviceEndpoint,
 	}
-	httpClient := AddLoggingTransportIfNeeded(http.DefaultClient)
+	httpClient := http.DefaultClient
 	codeReq, err := oauth2device.RequestDeviceCode(httpClient, deviceConfig)
 	if err != nil {
 		return
