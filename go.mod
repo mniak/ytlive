@@ -10,7 +10,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.1
 	golang.org/x/net v0.0.0-20210119194325-5f4716e94777 // indirect
-	golang.org/x/oauth2 v0.0.0-20210201163806-010130855d6c
+	golang.org/x/oauth2 v0.0.0-20210210192628-66670185b0cd
 	google.golang.org/api v0.39.0
 	gopkg.in/yaml.v2 v2.2.8
 )
