@@ -37,7 +37,8 @@ type ScheduleResponse struct {
 
 func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 
-	ctx, tokenSource := internal.GetTokenSource()
+	config := internal.GetConfig("", "")
+	ctx, tokenSource := internal.GetTokenSource(config)
 
 	svc, err := youtube.NewService(ctx, option.WithTokenSource(tokenSource))
 	if err != nil {

@@ -28,7 +28,6 @@ import (
 	"github.com/araddon/dateparse"
 	"github.com/mniak/ytlive/pkg"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // scheduleCmd represents the schedule command
@@ -83,12 +82,6 @@ var scheduleCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(scheduleCmd)
-
-	scheduleCmd.PersistentFlags().String("client-id", "", "the Youtube Client ID")
-	viper.BindPFlag("Youtube.ClientID", scheduleCmd.PersistentFlags().Lookup("client-id"))
-
-	scheduleCmd.PersistentFlags().String("client-secret", "", "the Youtube Client Secret")
-	viper.BindPFlag("Youtube.ClientSecret", scheduleCmd.PersistentFlags().Lookup("client-secret"))
 
 	scheduleCmd.Flags().Bool("auto-start", false, "enable auto-start")
 	scheduleCmd.Flags().Bool("auto-stop", false, "enable auto-stop")

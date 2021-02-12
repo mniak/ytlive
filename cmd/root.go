@@ -47,7 +47,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.generate-streams.toml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ytlive.toml)")
 	rootCmd.PersistentFlags().Bool("debug", false, "enable debug mode")
 	viper.BindPFlag("Debug", rootCmd.PersistentFlags().Lookup("debug"))
 }
@@ -66,9 +66,9 @@ func initConfig() {
 			os.Exit(1)
 		}
 
-		// Search config in home directory with name ".generate-streams" (without extension).
+		// Search config in home directory with name ".ytlive" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".generate-streams")
+		viper.SetConfigName(".ytlive")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

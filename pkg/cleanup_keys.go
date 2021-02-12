@@ -13,7 +13,8 @@ import (
 
 func CleanupKeys(since time.Time) ([]string, error) {
 
-	ctx, tokenSource := internal.GetTokenSource()
+	config := internal.GetConfig("", "")
+	ctx, tokenSource := internal.GetTokenSource(config)
 
 	svc, err := youtube.NewService(ctx, option.WithTokenSource(tokenSource))
 	if err != nil {

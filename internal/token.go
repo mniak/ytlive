@@ -51,23 +51,31 @@ func (ts GoogleAuthTokenSource) Token() (token *oauth2.Token, err error) {
 	return
 }
 
-func GetTokenSource() (context.Context, CachedTokenSource) {
+func GetConfig(clientId, clientSecret string) oauth2.Config {
+	config := oauth2.Config{
+		ClientID:     clientId,
+		ClientSecret: clientSecret,
+		Endpoint:     google.Endpoint,
+		RedirectURL:  "http://localhost",
+		Scopes:       []string{"https://www.googleapis.com/auth/youtube"},
+	}
+	return config
+}
+
+func GetTokenSource(config oauth2.Config) (context.Context, CachedTokenSource) {
 	ctx := context.Background()
-	gts := NewGoogleTokenSource(ctx)
-	tokenSource := NewCachedTokenSource(ctx, gts, gts.Config)
+	tokenSource := NewCachedTokenSource(ctx, config)
 	return ctx, tokenSource
 }
 
 type CachedTokenSource struct {
-	Inner  oauth2.TokenSource
 	config oauth2.Config
 	ctx    context.Context
 }
 
-func NewCachedTokenSource(ctx context.Context, inner oauth2.TokenSource, config oauth2.Config) CachedTokenSource {
+func NewCachedTokenSource(ctx context.Context, config oauth2.Config) CachedTokenSource {
 	return CachedTokenSource{
 		ctx:    ctx,
-		Inner:  inner,
 		config: config,
 	}
 }
