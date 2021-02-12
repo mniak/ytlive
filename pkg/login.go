@@ -15,42 +15,30 @@ import (
 func Login() error {
 
 	config := internal.GetOAuthConfig()
-
-	_, err := authenticate(config)
-	if err != nil {
+	if err := authenticate(config); err != nil {
 		return errors.Wrap(err, "could not authenticate")
 	}
 
 	return nil
 }
 
-func authenticate(config oauth2.Config) (token *oauth2.Token, err error) {
+func authenticate(oauthConfig oauth2.Config) error {
 	deviceConfig := &oauth2device.Config{
-		Config:         &config,
+		Config:         &oauthConfig,
 		DeviceEndpoint: googledevice.DeviceEndpoint,
 	}
 	httpClient := http.DefaultClient
 	codeReq, err := oauth2device.RequestDeviceCode(httpClient, deviceConfig)
 	if err != nil {
-		err = errors.Wrap(err, "failed to request device code")
-		return
+		return errors.Wrap(err, "failed to request device code")
 	}
 
 	fmt.Printf("[Google Authentication] Navigate to %v type the following code: %v\n", codeReq.VerificationURL, codeReq.UserCode)
 
-	token, err = oauth2device.WaitForDeviceAuthorization(httpClient, deviceConfig, codeReq)
+	token, err := oauth2device.WaitForDeviceAuthorization(httpClient, deviceConfig, codeReq)
 	if err != nil {
-		err = errors.Wrap(err, "could not get token")
-		return
+		return errors.Wrap(err, "could not get token")
 	}
-	return token, saveToken(token)
-}
-
-func saveToken(token *oauth2.Token) error {
 	config.Root.Token = *token
-	err := config.Save()
-	if err != nil {
-		return errors.Wrap(err, "could not save token")
-	}
-	return nil
+	return config.Save()
 }
