@@ -9,8 +9,8 @@ import (
 
 	"github.com/mniak/oauth2device"
 	"github.com/mniak/oauth2device/googledevice"
+	"github.com/mniak/ytlive/config"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"gopkg.in/yaml.v2"
@@ -25,8 +25,8 @@ func NewGoogleTokenSource(ctx context.Context) GoogleAuthTokenSource {
 	return GoogleAuthTokenSource{
 		ctx: ctx,
 		Config: oauth2.Config{
-			ClientID:     viper.GetString("Youtube.ClientID"),
-			ClientSecret: viper.GetString("Youtube.ClientSecret"),
+			ClientID:     config.Root.Application.ClientID,
+			ClientSecret: config.Root.Application.ClientSecret,
 			Endpoint:     google.Endpoint,
 			RedirectURL:  "http://localhost",
 			Scopes:       []string{"https://www.googleapis.com/auth/youtube"},
@@ -51,10 +51,10 @@ func (ts GoogleAuthTokenSource) Token() (token *oauth2.Token, err error) {
 	return
 }
 
-func GetConfig(clientId, clientSecret string) oauth2.Config {
+func GetOAuthConfig() oauth2.Config {
 	config := oauth2.Config{
-		ClientID:     clientId,
-		ClientSecret: clientSecret,
+		ClientID:     config.Root.Application.ClientID,
+		ClientSecret: config.Root.Application.ClientSecret,
 		Endpoint:     google.Endpoint,
 		RedirectURL:  "http://localhost",
 		Scopes:       []string{"https://www.googleapis.com/auth/youtube"},

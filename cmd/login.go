@@ -24,9 +24,9 @@ package cmd
 import (
 	"log"
 
+	"github.com/mniak/ytlive/config"
 	"github.com/mniak/ytlive/pkg"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // loginCmd represents the login command
@@ -44,7 +44,9 @@ var loginCmd = &cobra.Command{
 			log.Fatalln(err)
 		}
 
-		err = pkg.Login(clientID, clientSecret)
+		config.Root.Application.ClientID = clientID
+		config.Root.Application.ClientSecret = clientSecret
+		err = pkg.Login()
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -56,9 +58,7 @@ func init() {
 
 	loginCmd.Flags().String("client-id", "", "the Youtube Client ID")
 	loginCmd.MarkFlagRequired("client-id")
-	viper.BindPFlag("Application.ClientID", loginCmd.Flags().Lookup("client-id"))
 
 	loginCmd.Flags().String("client-secret", "", "the Youtube Client Secret")
 	loginCmd.MarkFlagRequired("client-secret")
-	viper.BindPFlag("Application.ClientSecret", loginCmd.Flags().Lookup("client-secret"))
 }

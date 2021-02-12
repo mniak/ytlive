@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/ernesto-jimenez/httplogger"
-	"github.com/spf13/viper"
+	"github.com/mniak/ytlive/config"
 )
 
 func AddLoggingTransportIfNeeded(client *http.Client) *http.Client {
-	if viper.GetBool("Debug") {
+	if config.Root.Debug {
 		client.Transport = httplogger.NewLoggedTransport(http.DefaultTransport, newLogger())
 	}
 	return client

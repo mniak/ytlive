@@ -3,20 +3,18 @@ package pkg
 import (
 	"fmt"
 	"net/http"
-	"path"
 
-	homedir "github.com/mitchellh/go-homedir"
 	"github.com/mniak/oauth2device"
 	"github.com/mniak/oauth2device/googledevice"
+	"github.com/mniak/ytlive/config"
 	"github.com/mniak/ytlive/internal"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 )
 
-func Login(clientId, clientSecret string) error {
+func Login() error {
 
-	config := internal.GetConfig(clientId, clientSecret)
+	config := internal.GetOAuthConfig()
 
 	_, err := authenticate(config)
 	if err != nil {
@@ -34,22 +32,25 @@ func authenticate(config oauth2.Config) (token *oauth2.Token, err error) {
 	httpClient := internal.AddLoggingTransportIfNeeded(http.DefaultClient)
 	codeReq, err := oauth2device.RequestDeviceCode(httpClient, deviceConfig)
 	if err != nil {
+		err = errors.Wrap(err, "failed to request device code")
 		return
 	}
 
 	fmt.Printf("[Google Authentication] Navigate to %v type the following code: %v\n", codeReq.VerificationURL, codeReq.UserCode)
 
 	token, err = oauth2device.WaitForDeviceAuthorization(httpClient, deviceConfig, codeReq)
+	if err != nil {
+		err = errors.Wrap(err, "could not get token")
+		return
+	}
 	return token, saveToken(token)
 }
 
 func saveToken(token *oauth2.Token) error {
-	tokens := make([]oauth2.Token, 0)
-	tokens = append(tokens, *token)
-	viper.Set("Tokens", tokens)
-	home, err := homedir.Dir()
+	config.Root.Token = *token
+	err := config.Save()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "could not save token")
 	}
-	return viper.WriteConfigAs(path.Join(home, ".ytlive.toml"))
+	return nil
 }
