@@ -9,8 +9,8 @@ import (
 
 	"github.com/mniak/oauth2device"
 	"github.com/mniak/oauth2device/googledevice"
+	"github.com/mniak/ytlive/config"
 	"github.com/pkg/errors"
-	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"gopkg.in/yaml.v2"
@@ -25,8 +25,8 @@ func NewGoogleTokenSource(ctx context.Context) GoogleAuthTokenSource {
 	return GoogleAuthTokenSource{
 		ctx: ctx,
 		Config: oauth2.Config{
-			ClientID:     viper.GetString("Youtube.ClientID"),
-			ClientSecret: viper.GetString("Youtube.ClientSecret"),
+			ClientID:     config.Root.Application.ClientID,
+			ClientSecret: config.Root.Application.ClientSecret,
 			Endpoint:     google.Endpoint,
 			RedirectURL:  "http://localhost",
 			Scopes:       []string{"https://www.googleapis.com/auth/youtube"},
@@ -39,7 +39,7 @@ func (ts GoogleAuthTokenSource) Token() (token *oauth2.Token, err error) {
 		Config:         &ts.Config,
 		DeviceEndpoint: googledevice.DeviceEndpoint,
 	}
-	httpClient := AddLoggingTransportIfNeeded(http.DefaultClient)
+	httpClient := http.DefaultClient
 	codeReq, err := oauth2device.RequestDeviceCode(httpClient, deviceConfig)
 	if err != nil {
 		return
@@ -51,23 +51,31 @@ func (ts GoogleAuthTokenSource) Token() (token *oauth2.Token, err error) {
 	return
 }
 
-func GetTokenSource() (context.Context, CachedTokenSource) {
+func GetOAuthConfig() oauth2.Config {
+	config := oauth2.Config{
+		ClientID:     config.Root.Application.ClientID,
+		ClientSecret: config.Root.Application.ClientSecret,
+		Endpoint:     google.Endpoint,
+		RedirectURL:  "http://localhost",
+		Scopes:       []string{"https://www.googleapis.com/auth/youtube"},
+	}
+	return config
+}
+
+func GetTokenSource(config oauth2.Config) (context.Context, CachedTokenSource) {
 	ctx := context.Background()
-	gts := NewGoogleTokenSource(ctx)
-	tokenSource := NewCachedTokenSource(ctx, gts, gts.Config)
+	tokenSource := NewCachedTokenSource(ctx, config)
 	return ctx, tokenSource
 }
 
 type CachedTokenSource struct {
-	Inner  oauth2.TokenSource
 	config oauth2.Config
 	ctx    context.Context
 }
 
-func NewCachedTokenSource(ctx context.Context, inner oauth2.TokenSource, config oauth2.Config) CachedTokenSource {
+func NewCachedTokenSource(ctx context.Context, config oauth2.Config) CachedTokenSource {
 	return CachedTokenSource{
 		ctx:    ctx,
-		Inner:  inner,
 		config: config,
 	}
 }

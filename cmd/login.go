@@ -22,34 +22,43 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/mniak/ytlive/config"
+	"github.com/mniak/ytlive/pkg"
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
+// loginCmd represents the login command
+var loginCmd = &cobra.Command{
+	Use:   "login",
+	Short: "Authenticates on youtube",
+	Run: func(cmd *cobra.Command, args []string) {
+		clientID, err := cmd.Flags().GetString("client-id")
+		if err != nil {
+			log.Fatalln(err)
+		}
 
-var rootCmd = &cobra.Command{
-	Use:   "ytlive",
-	Short: "A tool to manage YouTube live streams",
-}
+		clientSecret, err := cmd.Flags().GetString("client-secret")
+		if err != nil {
+			log.Fatalln(err)
+		}
 
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+		config.Root.Application.ClientID = clientID
+		config.Root.Application.ClientSecret = clientSecret
+		err = pkg.Login()
+		if err != nil {
+			log.Fatalln(err)
+		}
+	},
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-}
+	rootCmd.AddCommand(loginCmd)
 
-func initConfig() {
-	if _, err := config.Load(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+	loginCmd.Flags().String("client-id", "", "the Youtube Client ID")
+	loginCmd.MarkFlagRequired("client-id")
+
+	loginCmd.Flags().String("client-secret", "", "the Youtube Client Secret")
+	loginCmd.MarkFlagRequired("client-secret")
 }
