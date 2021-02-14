@@ -3,17 +3,13 @@ package internal
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/mniak/oauth2device"
 	"github.com/mniak/oauth2device/googledevice"
 	"github.com/mniak/ytlive/config"
-	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"gopkg.in/yaml.v2"
 )
 
 type GoogleAuthTokenSource struct {
@@ -62,70 +58,8 @@ func GetOAuthConfig() oauth2.Config {
 	return config
 }
 
-func GetTokenSource(config oauth2.Config) (context.Context, CachedTokenSource) {
+func GetTokenSource(config oauth2.Config) (context.Context, GoogleAuthTokenSource) {
 	ctx := context.Background()
-	tokenSource := NewCachedTokenSource(ctx, config)
+	tokenSource := NewGoogleTokenSource(ctx)
 	return ctx, tokenSource
-}
-
-type CachedTokenSource struct {
-	config oauth2.Config
-	ctx    context.Context
-}
-
-func NewCachedTokenSource(ctx context.Context, config oauth2.Config) CachedTokenSource {
-	return CachedTokenSource{
-		ctx:    ctx,
-		config: config,
-	}
-}
-
-const cacheFileName = ".youtube-token.cache"
-
-func (ts CachedTokenSource) tryLoadToken() (*oauth2.Token, error) {
-	token := &oauth2.Token{}
-
-	file, err := os.Open(cacheFileName)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	decoder := yaml.NewDecoder(file)
-	err = decoder.Decode(token)
-	if err != nil {
-		return nil, err
-	}
-
-	return token, nil
-}
-
-func (ts CachedTokenSource) saveToken(token *oauth2.Token) error {
-	file, err := os.Create(cacheFileName)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	encoder := yaml.NewEncoder(file)
-	return encoder.Encode(token)
-}
-
-func (ts CachedTokenSource) Token() (*oauth2.Token, error) {
-
-	token, err := ts.tryLoadToken()
-	if err != nil {
-		log.Println(errors.Wrap(err, "failed to load token from cache"))
-	}
-
-	token, err = ts.config.TokenSource(ts.ctx, token).Token()
-	if err != nil {
-		return token, err
-	}
-
-	err = ts.saveToken(token)
-	if err != nil {
-		log.Println(errors.Wrap(err, "failed to write token in cache"))
-	}
-	return token, nil
 }
