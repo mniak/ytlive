@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/mniak/oauth2device"
 	"github.com/mniak/oauth2device/googledevice"
@@ -13,7 +12,6 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-	"gopkg.in/yaml.v2"
 )
 
 type GoogleAuthTokenSource struct {
@@ -83,32 +81,22 @@ func NewCachedTokenSource(ctx context.Context, config oauth2.Config) CachedToken
 const cacheFileName = ".youtube-token.cache"
 
 func (ts CachedTokenSource) tryLoadToken() (*oauth2.Token, error) {
-	token := &oauth2.Token{}
-
-	file, err := os.Open(cacheFileName)
+	cfg, err := config.Load()
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
-
-	decoder := yaml.NewDecoder(file)
-	err = decoder.Decode(token)
-	if err != nil {
-		return nil, err
-	}
-
-	return token, nil
+	return &cfg.Token, nil
 }
 
 func (ts CachedTokenSource) saveToken(token *oauth2.Token) error {
-	file, err := os.Create(cacheFileName)
+	config.Root.Token = *token
+
+	err := config.Save()
 	if err != nil {
 		return err
 	}
-	defer file.Close()
 
-	encoder := yaml.NewEncoder(file)
-	return encoder.Encode(token)
+	return nil
 }
 
 func (ts CachedTokenSource) Token() (*oauth2.Token, error) {
