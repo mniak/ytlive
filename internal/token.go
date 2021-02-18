@@ -3,11 +3,13 @@ package internal
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/mniak/oauth2device"
 	"github.com/mniak/oauth2device/googledevice"
 	"github.com/mniak/ytlive/config"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )
@@ -58,8 +60,60 @@ func GetOAuthConfig() oauth2.Config {
 	return config
 }
 
-func GetTokenSource(config oauth2.Config) (context.Context, GoogleAuthTokenSource) {
+func GetTokenSource(config oauth2.Config) (context.Context, CachedTokenSource) {
 	ctx := context.Background()
-	tokenSource := NewGoogleTokenSource(ctx)
+	tokenSource := NewCachedTokenSource(ctx, config)
 	return ctx, tokenSource
+}
+
+type CachedTokenSource struct {
+	config oauth2.Config
+	ctx    context.Context
+}
+
+func NewCachedTokenSource(ctx context.Context, config oauth2.Config) CachedTokenSource {
+	return CachedTokenSource{
+		ctx:    ctx,
+		config: config,
+	}
+}
+
+const cacheFileName = ".youtube-token.cache"
+
+func (ts CachedTokenSource) tryLoadToken() (*oauth2.Token, error) {
+	cfg, err := config.Load()
+	if err != nil {
+		return nil, err
+	}
+	return &cfg.Token, nil
+}
+
+func (ts CachedTokenSource) saveToken(token *oauth2.Token) error {
+	config.Root.Token = *token
+
+	err := config.Save()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ts CachedTokenSource) Token() (*oauth2.Token, error) {
+
+	token, err := ts.tryLoadToken()
+	if err != nil {
+		log.Println(errors.Wrap(err, "failed to load token from cache"))
+	}
+
+	token, err = ts.config.TokenSource(ts.ctx, token).Token()
+	if err != nil {
+		return token, err
+	}
+
+	err = ts.saveToken(token)
+	if err != nil {
+		log.Println(errors.Wrap(err, "failed to write token in cache"))
+	}
+	return token, nil
 }
