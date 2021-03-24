@@ -18,7 +18,7 @@ var scheduleCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		title := args[0]
 
-		parsedDateTime, err := dateparse.ParseAny(args[1] + " " + args[2])
+		parsedDateTime, err := dateparse.ParseLocal(args[1] + " " + args[2])
 		if err != nil {
 			log.Fatalf("invalid datetime: %s %s\n", args[1], args[2])
 		}
@@ -35,7 +35,6 @@ var scheduleCmd = &cobra.Command{
 		if err != nil {
 			log.Fatalln(err)
 		}
-
 		request := pkg.ScheduleRequest{
 			Title:     title,
 			Date:      parsedDateTime,
