@@ -24,14 +24,14 @@ type ScheduleRequest struct {
 }
 
 type ScheduleResponse struct {
-	ID            string
-	Title         string
-	Description   string
-	Date          time.Time
-	Link          string
-	StreamKeyName string
-	StreamKey     string
-	StreamURL     string
+	ID          string
+	Title       string
+	Description string
+	Date        time.Time
+	Link        string
+	StreamName  string
+	StreamKey   string
+	StreamURL   string
 }
 
 func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
@@ -72,7 +72,7 @@ func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 
 	result.StreamURL = stream.Cdn.IngestionInfo.IngestionAddress
 	result.StreamKey = stream.Cdn.IngestionInfo.StreamName
-	result.StreamKeyName = stream.Snippet.Title
+	result.StreamName = stream.Snippet.Title
 
 	broadcast, err := svc.LiveBroadcasts.Insert(
 		[]string{

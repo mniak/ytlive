@@ -12,7 +12,7 @@ import (
 // scheduleCmd represents the schedule command
 var scheduleCmd = &cobra.Command{
 	Use:     "schedule <title> <date> <time>",
-	Aliases: []string{"yt"},
+	Aliases: []string{"new"},
 	Short:   "Schedule a new youtube live stream",
 	Args:    cobra.ExactArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
@@ -50,9 +50,9 @@ var scheduleCmd = &cobra.Command{
 		fmt.Println("Youtube Stream Scheduled:")
 		fmt.Printf("  ID:         %s\n", response.ID)
 		fmt.Printf("  Title:      %s\n", response.Title)
-		fmt.Printf("  Date:       %s\n", response.Date)
+		fmt.Printf("  Date:       %s\n", response.Date.Local())
 		fmt.Printf("  Link:       %s\n", response.Link)
-		fmt.Printf("  Key Name:   %s\n", response.StreamKeyName)
+		fmt.Printf("  Stream Name:   %s\n", response.StreamName)
 		fmt.Printf("  Stream Key: %s\n", response.StreamKey)
 		fmt.Printf("  Stream URL: %s\n", response.StreamURL)
 	},
