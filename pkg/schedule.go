@@ -43,21 +43,24 @@ func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 
 	stream, err := svc.LiveStreams.Insert(
 		[]string{
-			"snippet",
-			"cdn",
-			"contentDetails",
+			"Snippet",
+			"Cdn",
+			"ContentDetails",
 		},
 		&youtube.LiveStream{
 			Snippet: &youtube.LiveStreamSnippet{
 				Title: fmt.Sprintf("[%s] Generated Key (ytlive)", options.Date.Format("2006-01-02")),
 			},
 			Cdn: &youtube.CdnSettings{
-				FrameRate:     "30fps",
 				IngestionType: "rtmp",
-				Resolution:    "1080p",
+				Resolution:    "variable",
+				FrameRate:     "variable",
 			},
 			ContentDetails: &youtube.LiveStreamContentDetails{
 				IsReusable: false,
+				ForceSendFields: []string{
+					"IsReusable",
+				},
 			},
 		},
 	).Do()
@@ -73,9 +76,9 @@ func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 
 	broadcast, err := svc.LiveBroadcasts.Insert(
 		[]string{
-			"snippet",
-			"status",
-			"contentDetails",
+			"Snippet",
+			"Status",
+			"ContentDetails",
 		},
 		&youtube.LiveBroadcast{
 			Snippet: &youtube.LiveBroadcastSnippet{
@@ -86,11 +89,20 @@ func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 			Status: &youtube.LiveBroadcastStatus{
 				PrivacyStatus:           "public",
 				SelfDeclaredMadeForKids: false,
+				ForceSendFields: []string{
+					"SelfDeclaredMadeForKids",
+				},
 			},
 			ContentDetails: &youtube.LiveBroadcastContentDetails{
 				EnableAutoStart: options.AutoStart,
 				EnableAutoStop:  options.AutoStop,
 				EnableDvr:       options.DVR,
+
+				ForceSendFields: []string{
+					"AutoStart",
+					"AutoStop",
+					"EnableDvr",
+				},
 			},
 		},
 	).Do()
