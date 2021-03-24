@@ -35,8 +35,11 @@ func (ts CachedTokenSource) saveToken(token *oauth2.Token) error {
 
 func (ts CachedTokenSource) Token() (*oauth2.Token, error) {
 
-	if config.Root.Token.AccessToken != "" && config.Root.Token.Expiry.After(time.Now()) {
-		return &config.Root.Token, nil
+	if config.Root.Token.AccessToken != "" {
+		if config.Root.Token.Expiry.After(time.Now()) {
+			return &config.Root.Token, nil
+		}
+		log.Println("access token expired")
 	}
 
 	if config.Root.Token.RefreshToken == "" {

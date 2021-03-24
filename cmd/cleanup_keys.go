@@ -11,8 +11,9 @@ import (
 
 // cleanupKeysCmd represents the cleanup-keys command
 var cleanupKeysCmd = &cobra.Command{
-	Use:   "cleanup-keys",
-	Short: "Cleanup old stream keys",
+	Use:     "cleanup-keys",
+	Aliases: []string{"cleanup", "clean"},
+	Short:   "Cleanup old stream keys",
 	Run: func(cmd *cobra.Command, args []string) {
 
 		since := time.Now().Add(7 * 24 * time.Hour * -1)

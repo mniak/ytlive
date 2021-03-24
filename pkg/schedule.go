@@ -100,6 +100,15 @@ func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 		return
 	}
 
+	broadcast, err = svc.LiveBroadcasts.Bind(broadcast.Id, []string{}).
+		StreamId(stream.Id).
+		Do()
+
+	if err != nil {
+		err = errors.Wrap(err, "could not bind broadcast to stream")
+		return
+	}
+
 	scheduledDate, _ := dateparse.ParseAny(broadcast.Snippet.ScheduledStartTime)
 	result.ID = broadcast.Id
 	result.Title = broadcast.Snippet.Title
