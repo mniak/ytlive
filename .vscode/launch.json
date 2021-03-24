@@ -9,7 +9,6 @@
             "program": "${workspaceFolder}",
             "args": [
                 "schedule", "New Broadcast", "2021-05-01", "18:45",
-                // "--debug",
                 "--auto-start",
                 "--auto-stop",
                 "--dvr=false",
