@@ -7,7 +7,6 @@ import (
 	"github.com/araddon/dateparse"
 	"github.com/mniak/ytlive/internal"
 	"github.com/pkg/errors"
-	"google.golang.org/api/option"
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -37,12 +36,8 @@ type ScheduleResponse struct {
 
 func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 
-	config := internal.GetOAuthConfig()
-	ctx, tokenSource := internal.GetTokenSource(config)
-
-	svc, err := youtube.NewService(ctx, option.WithTokenSource(tokenSource))
+	svc, err := internal.CreateYoutubeClient()
 	if err != nil {
-		errors.Wrap(err, "could not create Youtube API client")
 		return
 	}
 
@@ -101,7 +96,7 @@ func Schedule(options ScheduleRequest) (result ScheduleResponse, err error) {
 	).Do()
 
 	if err != nil {
-		err = errors.Wrap(err, "could not create a new stream")
+		err = errors.Wrap(err, "could not create a new broadcast")
 		return
 	}
 

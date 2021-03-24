@@ -7,18 +7,13 @@ import (
 	"github.com/araddon/dateparse"
 	"github.com/mniak/ytlive/internal"
 	"github.com/pkg/errors"
-	"google.golang.org/api/option"
-	"google.golang.org/api/youtube/v3"
 )
 
 func CleanupKeys(since time.Time) ([]string, error) {
 
-	config := internal.GetOAuthConfig()
-	ctx, tokenSource := internal.GetTokenSource(config)
-
-	svc, err := youtube.NewService(ctx, option.WithTokenSource(tokenSource))
+	svc, err := internal.CreateYoutubeClient()
 	if err != nil {
-		return nil, errors.Wrap(err, "could not create Youtube API client")
+		return nil, err
 	}
 
 	streams, err := svc.LiveStreams.List(
@@ -30,7 +25,7 @@ func CleanupKeys(since time.Time) ([]string, error) {
 	}
 
 	cleaned := make([]string, 0)
-	r := regexp.MustCompile("\\[(.*)\\].*")
+	r := regexp.MustCompile(`\[(.*)\].*`)
 	for _, stream := range streams.Items {
 		title := stream.Snippet.Title
 		if !r.MatchString(title) {
