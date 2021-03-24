@@ -12,7 +12,7 @@ import (
 // scheduleCmd represents the schedule command
 var scheduleCmd = &cobra.Command{
 	Use:     "schedule <title> <date> <time>",
-	Aliases: []string{"yt"},
+	Aliases: []string{"new"},
 	Short:   "Schedule a new youtube live stream",
 	Args:    cobra.ExactArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
