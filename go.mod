@@ -6,7 +6,7 @@ require (
 	github.com/araddon/dateparse v0.0.0-20210207001429-0eec95c9db7e
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mniak/oauth2device v0.1.1
-	github.com/pelletier/go-toml v1.8.1
+	github.com/pelletier/go-toml v1.9.1
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.3
 	golang.org/x/oauth2 v0.0.0-20210313182246-cd4f82c27b84
