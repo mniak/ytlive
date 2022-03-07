@@ -9,6 +9,6 @@ require (
 	github.com/pelletier/go-toml v1.9.1
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.3
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
-	google.golang.org/api v0.46.0
+	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
+	google.golang.org/api v0.70.0
 )
